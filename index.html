@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PlumeLAN - 个人网站</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- 背景容器 -->
+    <div class="background-container" id="bgContainer"></div>
+    
+    <!-- 主容器 -->
+    <main class="container">
+        <!-- 语言切换 -->
+        <div class="lang-switcher">
+            <button class="lang-btn active" data-lang="zh">中文</button>
+            <button class="lang-btn" data-lang="en">English</button>
+        </div>
+
+        <!-- 名字展示 -->
+        <section class="header-section">
+            <img src="assets/name/name.png" alt="PlumeLAN" class="name-logo" />
+        </section>
+
+        <!-- 社交媒体和简介 -->
+        <section class="social-section">
+            <p class="intro-text" data-i18n="intro">
+                欢迎来到我的个人网站，这里展示我的作品和想法
+            </p>
+            
+            <div class="social-links">
+                <a href="#" class="social-link" data-social="github" title="GitHub">
+                    <img src="assets/icons/github.svg" alt="GitHub" />
+                </a>
+                <a href="#" class="social-link" data-social="twitter" title="Twitter">
+                    <img src="assets/icons/twitter.svg" alt="Twitter" />
+                </a>
+                <a href="#" class="social-link" data-social="bilibili" title="Bilibili">
+                    <img src="assets/icons/bilibili.svg" alt="Bilibili" />
+                </a>
+                <a href="#" class="social-link" data-social="email" title="Email">
+                    <img src="assets/icons/email.svg" alt="Email" />
+                </a>
+            </div>
+        </section>
+
+        <!-- 作品轮播 -->
+        <section class="portfolio-section">
+            <h2 data-i18n="portfolio">我的作品</h2>
+            
+            <div class="carousel-container">
+                <div class="carousel" id="carousel">
+                    <!-- 动态加载的作品图片 -->
+                </div>
+                
+                <button class="carousel-btn prev" id="prevBtn">❮</button>
+                <button class="carousel-btn next" id="nextBtn">❯</button>
+            </div>
+            
+            <div class="carousel-dots" id="dots"></div>
+        </section>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>

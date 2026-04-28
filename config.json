@@ -1,0 +1,21 @@
+{
+    "siteName": "PlumeLAN",
+    "background": "assets/backgrounds/default.jpg",
+    "portfolioImages": [
+        "assets/portfolio/work1.jpg",
+        "assets/portfolio/work2.jpg",
+        "assets/portfolio/work3.jpg",
+        "assets/portfolio/work4.jpg",
+        "assets/portfolio/work5.jpg"
+    ],
+    "socialLinks": {
+        "github": "https://github.com/PlumeLAN",
+        "twitter": "https://twitter.com/yourhandle",
+        "bilibili": "https://space.bilibili.com/yourid",
+        "email": "mailto:your.email@example.com"
+    },
+    "portfolio": {
+        "autoPlay": true,
+        "autoPlayInterval": 5000
+    }
+}
