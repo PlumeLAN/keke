@@ -9,10 +9,10 @@ const config = {
         'assets/portfolio/work5.jpg'
     ],
     socialLinks: {
-        github: 'https://github.com/PlumeLAN',
-        twitter: 'https://twitter.com/yourhandle',
-        bilibili: 'https://space.bilibili.com/yourid',
-        email: 'mailto:your.email@example.com'
+        pixiv: 'https://www.pixiv.net/users/27233420',
+        x: 'https://x.com/xiaofeiyang678',
+        bilibili: 'https://space.bilibili.com/3706955501669233?spm_id_from=333.1007.0.0',
+        fanbox: 'https://xiaofeiyang.fanbox.cc/'
     }
 };
 
