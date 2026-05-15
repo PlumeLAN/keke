@@ -14,9 +14,9 @@ const translations = {
     zh: {
         tagline: '数字绘画师 | 创意设计者 | 内容创作者',
         bio: '欢迎来到我的个人网站，这里是连接我不同平台的枢纽中心。在这里你可以快速访问我的所有创作平台。',
-        'nav-platforms': '平台导航',
+        'nav-platforms': '创作平台',
         'nav-activity': '最新动态',
-        'platforms-title': '平台导航中心',
+        'platforms-title': '我的创作平台',
         'pixiv-desc': '专业插画创作平台',
         'bilibili-desc': '绘画教程 & 直播平台',
         'twitter-desc': '日常分享 & 创作动态',
@@ -44,9 +44,9 @@ const translations = {
     en: {
         tagline: 'Digital Artist | Creative Designer | Content Creator',
         bio: 'Welcome to my personal website, the hub connecting all my creative platforms. Here you can quickly access all my work.',
-        'nav-platforms': 'Platform Hub',
+        'nav-platforms': 'Platforms',
         'nav-activity': 'Latest Activity',
-        'platforms-title': 'Platform Navigation Center',
+        'platforms-title': 'My Platforms',
         'pixiv-desc': 'Professional illustration platform',
         'bilibili-desc': 'Painting tutorials & Live streaming',
         'twitter-desc': 'Daily sharing & Creative updates',
