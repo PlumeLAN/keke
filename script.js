@@ -246,21 +246,20 @@ function initLikeButton() {
     
     // 点赞按钮点击事件
     likeBtn.addEventListener('click', () => {
-        // 清除当前显示
-        likeEmojisEl.innerHTML = '';
-        
         if (currentEmojiIndex === 0) {
             // 当前没有显示，显示第一张
             currentEmojiIndex = 1;
             likeCount++;
             addEmojiToDisplay(likeEmojisEl, currentEmojiIndex);
         } else if (currentEmojiIndex < maxEmojis) {
-            // 显示下一张
+            // 有显示，切换到下一张（先移除当前的，再显示下一张）
+            likeEmojisEl.innerHTML = '';
             currentEmojiIndex++;
             likeCount++;
             addEmojiToDisplay(likeEmojisEl, currentEmojiIndex);
         } else {
-            // 当前显示第5张，点击取消显示
+            // 当前显示第5张，点击取消显示（移除）
+            likeEmojisEl.innerHTML = '';
             currentEmojiIndex = 0;
         }
         
