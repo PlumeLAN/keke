@@ -97,13 +97,18 @@ const translations = {
 
 let currentLanguage = 'zh';
 
-// 初始化
-document.addEventListener('DOMContentLoaded', () => {
+// 初始化函数
+document.addEventListener('DOMContentLoaded', initApp);
+
+// 主初始化函数
+function initApp() {
     initBackground();
     initLanguageSwitcher();
     initThemeToggle();
     updateLanguage();
-});
+    initPlatformCards();
+    initStatObserver();
+}
 
 // 初始化背景
 function initBackground() {
@@ -168,7 +173,7 @@ function scrollTo(selector) {
 window.scrollTo = scrollTo;
 
 // 平台卡片交互效果
-document.addEventListener('DOMContentLoaded', () => {
+function initPlatformCards() {
     const platformCards = document.querySelectorAll('.platform-card');
     
     platformCards.forEach(card => {
@@ -180,7 +185,7 @@ document.addEventListener('DOMContentLoaded', () => {
             this.style.transform = 'translateY(0) scale(1)';
         });
     });
-});
+}
 
 // 统计数据动画
 function animateCounter(element, finalValue, duration = 1000) {
@@ -208,30 +213,30 @@ function animateCounter(element, finalValue, duration = 1000) {
     updateCounter();
 }
 
-// 当统计卡片进入视图时触发动画
-const observerOptions = {
-    threshold: 0.5,
-    rootMargin: '0px'
-};
-
-const observer = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-        if (entry.isIntersecting && entry.target.classList.contains('stat-card')) {
-            const numberElement = entry.target.querySelector('.stat-number');
-            if (numberElement && !numberElement.animated) {
-                animateCounter(numberElement, numberElement.textContent);
-                numberElement.animated = true;
+// 观察统计卡片
+function initStatObserver() {
+    const observerOptions = {
+        threshold: 0.5,
+        rootMargin: '0px'
+    };
+    
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting && entry.target.classList.contains('stat-card')) {
+                const numberElement = entry.target.querySelector('.stat-number');
+                if (numberElement && !numberElement.animated) {
+                    animateCounter(numberElement, numberElement.textContent);
+                    numberElement.animated = true;
+                }
             }
-        }
-    });
-}, observerOptions);
-
-// 观察所有统计卡片
-document.addEventListener('DOMContentLoaded', () => {
+        });
+    }, observerOptions);
+    
+    // 观察所有统计卡片
     document.querySelectorAll('.stat-card').forEach(card => {
         observer.observe(card);
     });
-});
+}
 
 // 返回顶部功能（可选）
 window.addEventListener('scroll', () => {
