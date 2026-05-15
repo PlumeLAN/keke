@@ -570,6 +570,7 @@ html[data-theme="dark"] .about-content {
     display: flex;
     flex-wrap: wrap;
     gap: 12px;
+    justify-content: center;
 }
 
 .tool {
