@@ -75,6 +75,11 @@ const translations = {
 
 let currentLanguage = 'zh';
 
+// 点赞相关配置
+let likeCount = parseInt(localStorage.getItem('likeCount')) || 0;
+let currentEmojiIndex = parseInt(localStorage.getItem('emojiIndex')) || 0;
+const maxEmojis = 5;
+
 // 初始化函数
 document.addEventListener('DOMContentLoaded', initApp);
 
@@ -86,6 +91,7 @@ function initApp() {
     updateLanguage();
     initPlatformCards();
     initStatObserver();
+    initLikeButton();
 }
 
 // 初始化背景
@@ -223,3 +229,52 @@ window.addEventListener('scroll', () => {
         // 可以在这里添加返回顶部按钮的显示逻辑
     }
 });
+
+// 点赞功能
+function initLikeButton() {
+    const likeBtn = document.getElementById('likeBtn');
+    const likeCountEl = document.getElementById('likeCount');
+    const likeEmojisEl = document.getElementById('likeEmojis');
+    
+    // 初始化显示
+    likeCountEl.textContent = likeCount;
+    
+    // 恢复之前显示的表情
+    for (let i = 0; i < currentEmojiIndex; i++) {
+        addEmojiToDisplay(likeEmojisEl, i + 1);
+    }
+    
+    // 点赞按钮点击事件
+    likeBtn.addEventListener('click', () => {
+        likeCount++;
+        currentEmojiIndex = Math.min(currentEmojiIndex + 1, maxEmojis);
+        
+        // 保存到 localStorage
+        localStorage.setItem('likeCount', likeCount);
+        localStorage.setItem('emojiIndex', currentEmojiIndex);
+        
+        // 更新显示
+        likeCountEl.textContent = likeCount;
+        
+        // 添加表情
+        if (currentEmojiIndex <= maxEmojis) {
+            addEmojiToDisplay(likeEmojisEl, currentEmojiIndex);
+        }
+        
+        // 添加动画效果
+        likeBtn.style.transform = 'scale(1.2)';
+        setTimeout(() => {
+            likeBtn.style.transform = 'scale(1)';
+        }, 200);
+    });
+}
+
+function addEmojiToDisplay(container, index) {
+    const emojiImg = document.createElement('img');
+    emojiImg.src = `assets/icons/emoji${index}.png`;
+    emojiImg.alt = `表情${index}`;
+    emojiImg.className = 'emoji-img';
+    emojiImg.style.animation = 'fadeInUp 0.3s ease';
+    container.appendChild(emojiImg);
+}
+

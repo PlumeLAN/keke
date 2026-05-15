@@ -677,6 +677,74 @@ html[data-theme="dark"] .about-content {
     }
 }
 
+/* 点赞区域 */
+.like-section {
+    text-align: center;
+    padding: 50px 30px;
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    border-radius: 15px;
+    margin-bottom: 40px;
+}
+
+.like-section h2 {
+    font-size: 28px;
+    margin-bottom: 30px;
+    color: white;
+}
+
+.like-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+}
+
+.like-btn {
+    background: white;
+    border: none;
+    border-radius: 50%;
+    width: 80px;
+    height: 80px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    font-size: 24px;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.like-btn:hover {
+    transform: scale(1.1);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+}
+
+.like-icon {
+    font-size: 32px;
+}
+
+.like-count {
+    font-weight: bold;
+    color: var(--primary-color);
+}
+
+.like-emojis {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: center;
+    max-width: 400px;
+}
+
+.emoji-img {
+    width: 50px;
+    height: 50px;
+    object-fit: cover;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
 /* 响应式设计 */
 @media (max-width: 768px) {
     .container {

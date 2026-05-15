@@ -150,13 +150,15 @@
             </div>
         </section>
 
-        <!-- CTA 行动呼吁 -->
-        <section class="cta-section">
-            <h2 data-i18n="cta-title">想要跟随我的创作？</h2>
-            <p data-i18n="cta-desc">选择你最喜欢的平台关注我，不错过任何精彩内容</p>
-            <div class="cta-buttons">
-                <button class="cta-btn btn-primary" onclick="scrollTo('#platforms')" data-i18n="cta-explore">立即探索所有平台</button>
-                <button class="cta-btn btn-secondary" data-i18n="cta-subscribe">订阅邮件更新</button>
+        <!-- 点赞区域 -->
+        <section class="like-section">
+            <h2>喜欢我的作品就点个赞</h2>
+            <div class="like-container">
+                <button class="like-btn" id="likeBtn">
+                    <span class="like-icon">❤️</span>
+                    <span class="like-count" id="likeCount">0</span>
+                </button>
+                <div class="like-emojis" id="likeEmojis"></div>
             </div>
         </section>
     </main>
