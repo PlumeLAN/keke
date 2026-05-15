@@ -240,14 +240,26 @@ function initLikeButton() {
     likeCountEl.textContent = likeCount;
     
     // 恢复之前显示的表情
-    for (let i = 0; i < currentEmojiIndex; i++) {
-        addEmojiToDisplay(likeEmojisEl, i + 1);
+    if (currentEmojiIndex > 0) {
+        addEmojiToDisplay(likeEmojisEl, currentEmojiIndex);
     }
     
     // 点赞按钮点击事件
     likeBtn.addEventListener('click', () => {
-        likeCount++;
-        currentEmojiIndex = Math.min(currentEmojiIndex + 1, maxEmojis);
+        if (currentEmojiIndex < maxEmojis) {
+            // 增加表情
+            currentEmojiIndex++;
+            likeCount++;
+            
+            // 清除之前的表情，显示新的
+            likeEmojisEl.innerHTML = '';
+            addEmojiToDisplay(likeEmojisEl, currentEmojiIndex);
+        } else {
+            // 达到最大值，取消上一张（回到第一张）
+            currentEmojiIndex = 0;
+            likeCount = 0;
+            likeEmojisEl.innerHTML = '';
+        }
         
         // 保存到 localStorage
         localStorage.setItem('likeCount', likeCount);
@@ -255,11 +267,6 @@ function initLikeButton() {
         
         // 更新显示
         likeCountEl.textContent = likeCount;
-        
-        // 添加表情
-        if (currentEmojiIndex <= maxEmojis) {
-            addEmojiToDisplay(likeEmojisEl, currentEmojiIndex);
-        }
         
         // 添加动画效果
         likeBtn.style.transform = 'scale(1.2)';
@@ -274,7 +281,7 @@ function addEmojiToDisplay(container, index) {
     emojiImg.src = `assets/icons/emoji${index}.png`;
     emojiImg.alt = `表情${index}`;
     emojiImg.className = 'emoji-img';
-    emojiImg.style.animation = 'fadeInUp 0.3s ease';
+    emojiImg.style.animation = 'fadeInRight 0.3s ease';
     container.appendChild(emojiImg);
 }
 

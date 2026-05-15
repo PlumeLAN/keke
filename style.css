@@ -677,6 +677,17 @@ html[data-theme="dark"] .about-content {
     }
 }
 
+@keyframes fadeInRight {
+    from {
+        opacity: 0;
+        transform: translateX(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
 /* 点赞区域 */
 .like-section {
     text-align: center;
@@ -694,9 +705,10 @@ html[data-theme="dark"] .about-content {
 
 .like-container {
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     align-items: center;
-    gap: 20px;
+    justify-content: center;
+    gap: 30px;
 }
 
 .like-btn {
@@ -731,18 +743,16 @@ html[data-theme="dark"] .about-content {
 
 .like-emojis {
     display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-    justify-content: center;
-    max-width: 400px;
+    align-items: center;
+    min-height: 60px;
 }
 
 .emoji-img {
-    width: 50px;
-    height: 50px;
+    width: 80px;
+    height: 80px;
     object-fit: cover;
-    border-radius: 8px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
 }
 
 /* 响应式设计 */
