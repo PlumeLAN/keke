@@ -235,17 +235,27 @@ function initLikeButton() {
     const likeBtn = document.getElementById('likeBtn');
     const likeCountEl = document.getElementById('likeCount');
     const likeEmojisEl = document.getElementById('likeEmojis');
+    const hintText = document.getElementById('hintText');
     
     // 初始化显示
     likeCountEl.textContent = likeCount;
     
     // 恢复之前显示的表情
     if (currentEmojiIndex > 0) {
+        // 移除提示文字
+        if (hintText) {
+            hintText.style.display = 'none';
+        }
         addEmojiToDisplay(likeEmojisEl, currentEmojiIndex);
     }
     
     // 点赞按钮点击事件
     likeBtn.addEventListener('click', () => {
+        // 移除提示文字
+        if (hintText) {
+            hintText.style.display = 'none';
+        }
+        
         if (currentEmojiIndex === 0) {
             // 当前没有显示，显示第一张
             currentEmojiIndex = 1;

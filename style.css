@@ -755,6 +755,11 @@ html[data-theme="dark"] .about-content {
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
 }
 
+.hint-text {
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 14px;
+}
+
 /* 响应式设计 */
 @media (max-width: 768px) {
     .container {
