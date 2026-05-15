@@ -12,55 +12,254 @@
     
     <!-- 主容器 -->
     <main class="container">
-        <!-- 语言切换 -->
-        <div class="lang-switcher">
-            <button class="lang-btn active" data-lang="zh">中文</button>
-            <button class="lang-btn" data-lang="en">English</button>
+        <!-- 语言切换 + 主题切换 -->
+        <div class="top-controls">
+            <div class="lang-switcher">
+                <button class="lang-btn active" data-lang="zh">中文</button>
+                <button class="lang-btn" data-lang="en">English</button>
+            </div>
+            
+            <button class="theme-toggle" id="themeToggle" title="切换主题">
+                <span class="theme-icon">🌙</span>
+            </button>
         </div>
 
-        <!-- 名字展示 -->
+        <!-- 头部 - 个人介绍 -->
         <section class="header-section">
             <img src="assets/name/name.png" alt="PlumeLAN" class="name-logo" />
-        </section>
-
-        <!-- 社交媒体和简介 -->
-        <section class="social-section">
-            <p class="intro-text" data-i18n="intro">
-                欢迎来到我的个人网站，这里展示我的作品和想法
-            </p>
-            
-            <div class="social-links">
-                <a href="#" class="social-link" data-social="pixiv" title="GitHub">
-                    <img src="assets/icons/github.svg" alt="GitHub" />
-                </a>
-                <a href="#" class="social-link" data-social="x" title="Twitter">
-                    <img src="assets/icons/twitter.svg" alt="Twitter" />
-                </a>
-                <a href="#" class="social-link" data-social="bilibili" title="Bilibili">
-                    <img src="assets/icons/bilibili.svg" alt="Bilibili" />
-                </a>
-                <a href="#" class="social-link" data-social="fanbox" title="Email">
-                    <img src="assets/icons/email.svg" alt="Email" />
-                </a>
+            <div class="intro-card">
+                <p class="tagline" data-i18n="tagline">数字绘画师 | 创意设计者 | 内容创作者</p>
+                <p class="bio" data-i18n="bio">欢迎来到我的个人网站，这里是连接我不同平台的枢纽中心。在这里你可以快速访问我的所有创作平台。</p>
             </div>
         </section>
 
-        <!-- 作品轮播 -->
-        <section class="portfolio-section">
-            <h2 data-i18n="portfolio">我的作品</h2>
+        <!-- 快速导航菜单 -->
+        <nav class="quick-nav">
+            <a href="#platforms" class="nav-item" data-i18n="nav-platforms">平台导航</a>
+            <a href="#activity" class="nav-item" data-i18n="nav-activity">最新动态</a>
+            <a href="#about" class="nav-item" data-i18n="nav-about">关于我</a>
+        </nav>
+
+        <!-- 平台卡片系统 -->
+        <section class="platforms-section" id="platforms">
+            <h2 data-i18n="platforms-title">平台导航中心</h2>
             
-            <div class="carousel-container">
-                <div class="carousel" id="carousel">
-                    <!-- 动态加载的作品图片 -->
+            <div class="platform-cards-container">
+                <!-- Pixiv -->
+                <div class="platform-card pixiv" data-platform="pixiv">
+                    <div class="card-header">
+                        <img src="assets/icons/pixiv.svg" alt="Pixiv" class="platform-icon" />
+                        <h3>Pixiv</h3>
+                    </div>
+                    
+                    <p class="platform-desc" data-i18n="pixiv-desc">专业插画创作平台</p>
+                    
+                    <div class="card-stats">
+                        <div class="stat-item">
+                            <span class="stat-label" data-i18n="followers">粉丝</span>
+                            <span class="stat-value followers-count">5.2K</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label" data-i18n="works">作品</span>
+                            <span class="stat-value works-count">127</span>
+                        </div>
+                    </div>
+                    
+                    <div class="card-tags">
+                        <span class="tag">插画</span>
+                        <span class="tag">原创</span>
+                        <span class="tag">高质量</span>
+                    </div>
+                    
+                    <a href="https://www.pixiv.net/users/27233420" target="_blank" class="card-link" data-i18n="visit">访问主页</a>
+                    
+                    <div class="card-hover-glow"></div>
                 </div>
-                
-                <button class="carousel-btn prev" id="prevBtn">❮</button>
-                <button class="carousel-btn next" id="nextBtn">❯</button>
+
+                <!-- Bilibili -->
+                <div class="platform-card bilibili" data-platform="bilibili">
+                    <div class="card-header">
+                        <img src="assets/icons/bilibili.svg" alt="Bilibili" class="platform-icon" />
+                        <h3>Bilibili</h3>
+                    </div>
+                    
+                    <p class="platform-desc" data-i18n="bilibili-desc">绘画教程 & 直播平台</p>
+                    
+                    <div class="card-stats">
+                        <div class="stat-item">
+                            <span class="stat-label" data-i18n="followers">粉丝</span>
+                            <span class="stat-value followers-count">12.3K</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label" data-i18n="works">视频</span>
+                            <span class="stat-value works-count">45</span>
+                        </div>
+                    </div>
+                    
+                    <div class="card-tags">
+                        <span class="tag">教程</span>
+                        <span class="tag">直播</span>
+                        <span class="tag">互动</span>
+                    </div>
+                    
+                    <a href="https://space.bilibili.com/3706955501669233?spm_id_from=333.1007.0.0" target="_blank" class="card-link" data-i18n="visit">访问频道</a>
+                    
+                    <div class="card-hover-glow"></div>
+                </div>
+
+                <!-- Twitter / X -->
+                <div class="platform-card twitter" data-platform="twitter">
+                    <div class="card-header">
+                        <img src="assets/icons/twitter.svg" alt="Twitter" class="platform-icon" />
+                        <h3>Twitter / X</h3>
+                    </div>
+                    
+                    <p class="platform-desc" data-i18n="twitter-desc">日常分享 & 创作动态</p>
+                    
+                    <div class="card-stats">
+                        <div class="stat-item">
+                            <span class="stat-label" data-i18n="followers">粉丝</span>
+                            <span class="stat-value followers-count">8.5K</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label" data-i18n="works">推文</span>
+                            <span class="stat-value works-count">892</span>
+                        </div>
+                    </div>
+                    
+                    <div class="card-tags">
+                        <span class="tag">日常</span>
+                        <span class="tag">互动</span>
+                        <span class="tag">实时</span>
+                    </div>
+                    
+                    <a href="https://x.com/xiaofeiyang678" target="_blank" class="card-link" data-i18n="visit">访问账号</a>
+                    
+                    <div class="card-hover-glow"></div>
+                </div>
+
+                <!-- Fanbox -->
+                <div class="platform-card fanbox" data-platform="fanbox">
+                    <div class="card-header">
+                        <img src="assets/icons/email.svg" alt="Fanbox" class="platform-icon" />
+                        <h3>Fanbox</h3>
+                    </div>
+                    
+                    <p class="platform-desc" data-i18n="fanbox-desc">创意支持社区</p>
+                    
+                    <div class="card-stats">
+                        <div class="stat-item">
+                            <span class="stat-label" data-i18n="followers">赞助者</span>
+                            <span class="stat-value followers-count">234</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label" data-i18n="works">内容</span>
+                            <span class="stat-value works-count">156</span>
+                        </div>
+                    </div>
+                    
+                    <div class="card-tags">
+                        <span class="tag">独家</span>
+                        <span class="tag">赞助</span>
+                        <span class="tag">内容</span>
+                    </div>
+                    
+                    <a href="https://xiaofeiyang.fanbox.cc/" target="_blank" class="card-link" data-i18n="visit">成为赞助者</a>
+                    
+                    <div class="card-hover-glow"></div>
+                </div>
             </div>
-            
-            <div class="carousel-dots" id="dots"></div>
+        </section>
+
+        <!-- 全平台数据统计 -->
+        <section class="global-stats">
+            <h2 data-i18n="stats-title">数据总览</h2>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <p class="stat-label" data-i18n="total-followers">总粉丝</p>
+                    <p class="stat-number" id="totalFollowers">38.0K+</p>
+                </div>
+                <div class="stat-card">
+                    <p class="stat-label" data-i18n="total-works">总作品</p>
+                    <p class="stat-number" id="totalWorks">1200+</p>
+                </div>
+                <div class="stat-card">
+                    <p class="stat-label" data-i18n="total-engagement">总互动</p>
+                    <p class="stat-number" id="totalEngagement">500K+</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- 最新动态 -->
+        <section class="activity-section" id="activity">
+            <h2 data-i18n="activity-title">最新动态</h2>
+            <div class="activity-feed">
+                <div class="activity-item pixiv">
+                    <span class="activity-badge">Pixiv</span>
+                    <h4 data-i18n="activity-1-title">新投稿：【原创】樱花少女</h4>
+                    <p class="activity-time">2 天前</p>
+                    <a href="#" class="activity-link" data-i18n="view-work">查看作品 →</a>
+                </div>
+
+                <div class="activity-item bilibili">
+                    <span class="activity-badge">Bilibili</span>
+                    <h4 data-i18n="activity-2-title">【教程】人物眼睛绘画技巧</h4>
+                    <p class="activity-time">1 周前</p>
+                    <a href="#" class="activity-link" data-i18n="view-video">观看视频 →</a>
+                </div>
+
+                <div class="activity-item twitter">
+                    <span class="activity-badge">Twitter</span>
+                    <h4 data-i18n="activity-3-title">分享日常速画过程</h4>
+                    <p class="activity-time">3 天前</p>
+                    <a href="#" class="activity-link" data-i18n="view-tweet">查看推文 →</a>
+                </div>
+            </div>
+        </section>
+
+        <!-- 关于我 -->
+        <section class="about-section" id="about">
+            <h2 data-i18n="about-title">关于我</h2>
+            <div class="about-content">
+                <div class="about-text">
+                    <h3 data-i18n="about-who">我是谁？</h3>
+                    <p data-i18n="about-who-desc">PlumeLAN 是一位热爱数字绘画的创意设计者，专注于人物插画和角色设计。通过不同的创意平台分享作品和创意想法。</p>
+
+                    <h3 data-i18n="about-journey">创作经历</h3>
+                    <ul class="timeline">
+                        <li><strong>2020年</strong> <span data-i18n="timeline-1">开始学习数字绘画</span></li>
+                        <li><strong>2021年</strong> <span data-i18n="timeline-2">在 Pixiv 发布第一幅作品</span></li>
+                        <li><strong>2023年</strong> <span data-i18n="timeline-3">粉丝总数突破 10K</span></li>
+                        <li><strong>2024年</strong> <span data-i18n="timeline-4">开设 Bilibili 频道</span></li>
+                        <li><strong>2026年</strong> <span data-i18n="timeline-5">建立个人品牌中心</span></li>
+                    </ul>
+
+                    <h3 data-i18n="about-tools">创作工具</h3>
+                    <div class="tools-list">
+                        <span class="tool">Photoshop</span>
+                        <span class="tool">Clip Studio Paint</span>
+                        <span class="tool">Procreate</span>
+                        <span class="tool">数位板</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- CTA 行动呼吁 -->
+        <section class="cta-section">
+            <h2 data-i18n="cta-title">想要跟随我的创作？</h2>
+            <p data-i18n="cta-desc">选择你最喜欢的平台关注我，不错过任何精彩内容</p>
+            <div class="cta-buttons">
+                <button class="cta-btn btn-primary" onclick="scrollToElement('#platforms')" data-i18n="cta-explore">立即探索所有平台</button>
+                <button class="cta-btn btn-secondary" data-i18n="cta-subscribe">订阅邮件更新</button>
+            </div>
         </section>
     </main>
+
+    <!-- 页脚 -->
+    <footer class="footer">
+        <p data-i18n="footer-made">Made with ❤️ by PlumeLAN | © 2026</p>
+    </footer>
 
     <script src="script.js"></script>
 </body>
