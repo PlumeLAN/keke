@@ -105,7 +105,7 @@ html[data-theme="dark"] .lang-btn {
 
 .lang-btn:hover {
     transform: translateY(-2px);
-    box-shadow: 0 4px 12px var(--primary-color) 0.4);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
 }
 
 /* 主题切换按钮 */
@@ -129,7 +129,7 @@ html[data-theme="dark"] .theme-toggle {
 
 .theme-toggle:hover {
     transform: scale(1.1) rotate(20deg);
-    box-shadow: 0 4px 12px var(--primary-color) 0.4);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
 }
 
 /* 头部 - 个人介绍 */
@@ -360,6 +360,7 @@ html[data-theme="dark"] .tag {
     font-weight: 600;
     transition: var(--transition);
     margin-top: 10px;
+    border: none;
 }
 
 .card-link:hover {
