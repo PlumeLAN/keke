@@ -252,15 +252,14 @@ function initLikeButton() {
             likeCount++;
             addEmojiToDisplay(likeEmojisEl, currentEmojiIndex);
         } else if (currentEmojiIndex < maxEmojis) {
-            // 有显示，切换到下一张（先移除当前的，再显示下一张）
+            // 有显示，且不是最后一张，切换到下一张（先移除当前的，再显示下一张）
             likeEmojisEl.innerHTML = '';
             currentEmojiIndex++;
             likeCount++;
             addEmojiToDisplay(likeEmojisEl, currentEmojiIndex);
         } else {
-            // 当前显示第5张，点击取消显示（移除）
-            likeEmojisEl.innerHTML = '';
-            currentEmojiIndex = 0;
+            // 当前显示第5张，继续显示第5张，只增加计数
+            likeCount++;
         }
         
         // 保存到 localStorage
