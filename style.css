@@ -688,6 +688,17 @@ html[data-theme="dark"] .about-content {
     }
 }
 
+@keyframes fadeOutLeft {
+    from {
+        opacity: 1;
+        transform: translateX(0);
+    }
+    to {
+        opacity: 0;
+        transform: translateX(-30px);
+    }
+}
+
 /* 点赞区域 */
 .like-section {
     text-align: center;
