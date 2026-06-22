@@ -425,91 +425,6 @@ html[data-theme="dark"] .stat-card {
     color: var(--primary-color);
 }
 
-/* 最新动态 */
-.activity-section {
-    margin-bottom: 60px;
-    animation: fadeInUp 0.6s ease 0.5s both;
-}
-
-.activity-section h2 {
-    text-align: center;
-    font-size: 28px;
-    margin-bottom: 40px;
-    color: var(--primary-color);
-}
-
-.activity-feed {
-    display: grid;
-    gap: 20px;
-}
-
-.activity-item {
-    background: white;
-    padding: 20px;
-    border-radius: 12px;
-    border-left: 4px solid var(--primary-color);
-    transition: var(--transition);
-}
-
-html[data-theme="dark"] .activity-item {
-    background: rgba(30, 30, 50, 0.8);
-}
-
-.activity-item.pixiv {
-    border-left-color: var(--pixiv-color);
-}
-
-.activity-item.bilibili {
-    border-left-color: var(--bilibili-color);
-}
-
-.activity-item.twitter {
-    border-left-color: var(--twitter-color);
-}
-
-.activity-item:hover {
-    transform: translateX(5px);
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
-}
-
-html[data-theme="dark"] .activity-item:hover {
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
-}
-
-.activity-badge {
-    display: inline-block;
-    font-size: 12px;
-    font-weight: 700;
-    padding: 4px 12px;
-    border-radius: 20px;
-    background: rgba(102, 126, 234, 0.2);
-    color: var(--primary-color);
-    margin-bottom: 10px;
-}
-
-.activity-item h4 {
-    font-size: 16px;
-    margin: 10px 0;
-    color: var(--text-color);
-}
-
-.activity-time {
-    font-size: 12px;
-    color: var(--light-text);
-    margin-bottom: 10px;
-}
-
-.activity-link {
-    color: var(--primary-color);
-    text-decoration: none;
-    font-weight: 600;
-    transition: var(--transition);
-}
-
-.activity-link:hover {
-    text-decoration: underline;
-}
-
 /* 关于我部分 */
 .about-section {
     margin-bottom: 60px;
@@ -816,7 +731,6 @@ html[data-theme="dark"] .about-content {
     }
 
     .platforms-section h2,
-    .activity-section h2,
     .global-stats h2,
     .about-section h2 {
         font-size: 24px;
