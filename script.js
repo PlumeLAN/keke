@@ -21,6 +21,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     initPlatformCards();
     initStatObserver();
     await initLikeButton();
+    initGalleryCarousel();
 });
 
 // 加载语言文件
@@ -272,6 +273,83 @@ function addEmojiToDisplay(container, index) {
     emojiImg.className = 'emoji-img';
     emojiImg.style.animation = 'fadeInRight 0.3s ease';
     container.appendChild(emojiImg);
+}
+
+// 作品轮播功能
+let currentSlide = 0;
+let totalSlides = 0;
+let autoPlayInterval;
+
+function initGalleryCarousel() {
+    const slides = document.querySelectorAll('.carousel-slide');
+    const dotsContainer = document.getElementById('carouselDots');
+    const prevBtn = document.getElementById('carouselPrev');
+    const nextBtn = document.getElementById('carouselNext');
+
+    if (slides.length === 0) return;
+
+    totalSlides = slides.length;
+
+    // 创建指示点
+    slides.forEach((_, index) => {
+        const dot = document.createElement('span');
+        dot.className = 'carousel-dot' + (index === 0 ? ' active' : '');
+        dot.addEventListener('click', () => goToSlide(index));
+        dotsContainer.appendChild(dot);
+    });
+
+    // 左右按钮点击事件
+    prevBtn.addEventListener('click', prevSlide);
+    nextBtn.addEventListener('click', nextSlide);
+
+    // 触摸滑动支持
+    let touchStartX = 0;
+    let touchEndX = 0;
+
+    const carousel = document.querySelector('.gallery-carousel');
+    carousel.addEventListener('touchstart', (e) => {
+        touchStartX = e.changedTouches[0].screenX;
+    });
+
+    carousel.addEventListener('touchend', (e) => {
+        touchEndX = e.changedTouches[0].screenX;
+        if (touchStartX - touchEndX > 50) {
+            nextSlide();
+        } else if (touchEndX - touchStartX > 50) {
+            prevSlide();
+        }
+    });
+
+    // 自动播放
+    startAutoPlay();
+}
+
+function goToSlide(index) {
+    const slides = document.querySelectorAll('.carousel-slide');
+    const dots = document.querySelectorAll('.carousel-dot');
+
+    slides[currentSlide].classList.remove('active');
+    dots[currentSlide].classList.remove('active');
+
+    currentSlide = index;
+    if (currentSlide >= totalSlides) currentSlide = 0;
+    if (currentSlide < 0) currentSlide = totalSlides - 1;
+
+    slides[currentSlide].classList.add('active');
+    dots[currentSlide].classList.add('active');
+}
+
+function nextSlide() {
+    goToSlide((currentSlide + 1) % totalSlides);
+}
+
+function prevSlide() {
+    goToSlide((currentSlide - 1 + totalSlides) % totalSlides);
+}
+
+function startAutoPlay() {
+    clearInterval(autoPlayInterval);
+    autoPlayInterval = setInterval(nextSlide, 4000);
 }
 
 // 返回顶部功能
