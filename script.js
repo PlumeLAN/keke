@@ -17,7 +17,7 @@ let currentLanguage = 'zh';
 // 点赞相关配置
 let likeCount = 0;
 let currentEmojiIndex = 0;
-const EMOJI_FRAME_COUNT = 5;
+const LAST_EMOJI_INDEX = 5;
 const MIN_AUTOPLAY_INTERVAL = 1000;
 
 // 初始化函数
@@ -228,14 +228,14 @@ async function initLikeButton() {
 
             const data = await response.json();
             likeCount = data.likeCount;
-            currentEmojiIndex = Math.min(data.emojiIndex, EMOJI_FRAME_COUNT);
+            currentEmojiIndex = Math.min(data.emojiIndex, LAST_EMOJI_INDEX);
             renderLikeState({
                 likeCountEl,
                 likeEmojisEl,
                 hintText
             });
 
-            if (previousEmojiIndex === EMOJI_FRAME_COUNT && currentEmojiIndex === EMOJI_FRAME_COUNT) {
+            if (previousEmojiIndex === LAST_EMOJI_INDEX && currentEmojiIndex === LAST_EMOJI_INDEX) {
                 animateCurrentEmoji(likeEmojisEl);
             }
         } catch (error) {
@@ -310,7 +310,7 @@ function initGalleryCarousel() {
     // 创建指示点
     slides.forEach((_, index) => {
         const dot = document.createElement('span');
-        dot.className = 'carousel-dot' + (index === currentSlide ? ' active' : '');
+        dot.className = `carousel-dot${index === currentSlide ? ' active' : ''}`;
         dot.addEventListener('click', () => goToSlide(index));
         dotsContainer.appendChild(dot);
     });
@@ -364,7 +364,7 @@ function renderPortfolioSlides() {
     slidesContainer.replaceChildren(
         ...images.map((image, index) => {
             const slide = document.createElement('div');
-            slide.className = `carousel-slide${index === 0 ? ' active' : ''}`;
+            slide.className = 'carousel-slide';
 
             const img = document.createElement('img');
             img.src = image;
