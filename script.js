@@ -17,7 +17,8 @@ let currentLanguage = 'zh';
 // 点赞相关配置
 let likeCount = 0;
 let currentEmojiIndex = 0;
-const maxEmojis = 5;
+const MAX_EMOJI_INDEX = 5;
+const MIN_AUTOPLAY_INTERVAL = 1000;
 
 // 初始化函数
 document.addEventListener('DOMContentLoaded', async () => {
@@ -114,7 +115,8 @@ function initLanguageSwitcher() {
 // 初始化背景
 function initBackground() {
     const bgContainer = document.getElementById('bgContainer');
-    bgContainer.style.backgroundImage = `url('${config.background}')`;
+    const background = isSafeAssetPath(config.background) ? config.background : defaultConfig.background;
+    bgContainer.style.backgroundImage = `url('${background}')`;
 }
 
 function initPlatformLinks() {
@@ -131,6 +133,10 @@ function initPlatformLinks() {
             link.href = socialLinks[platform];
         }
     });
+}
+
+function isSafeAssetPath(value) {
+    return typeof value === 'string' && /^assets\/[A-Za-z0-9/_\-.]+$/.test(value);
 }
 
 // 主题切换
@@ -222,14 +228,14 @@ async function initLikeButton() {
 
             const data = await response.json();
             likeCount = data.likeCount;
-            currentEmojiIndex = Math.min(data.emojiIndex, maxEmojis);
+            currentEmojiIndex = Math.min(data.emojiIndex, MAX_EMOJI_INDEX);
             renderLikeState({
                 likeCountEl,
                 likeEmojisEl,
                 hintText
             });
 
-            if (previousEmojiIndex === maxEmojis && currentEmojiIndex === maxEmojis) {
+            if (previousEmojiIndex === MAX_EMOJI_INDEX && currentEmojiIndex === MAX_EMOJI_INDEX) {
                 animateCurrentEmoji(likeEmojisEl);
             }
         } catch (error) {
@@ -247,7 +253,7 @@ async function initLikeButton() {
 
 function renderLikeState({likeCountEl, likeEmojisEl, hintText}) {
     likeCountEl.textContent = likeCount;
-    likeEmojisEl.innerHTML = '';
+    likeEmojisEl.querySelectorAll('.emoji-img').forEach(emoji => emoji.remove());
 
     if (currentEmojiIndex > 0) {
         if (hintText) {
@@ -298,15 +304,19 @@ function initGalleryCarousel() {
     if (slides.length === 0) return;
 
     totalSlides = slides.length;
-    currentSlide = 0;
+    currentSlide = Math.min(currentSlide, totalSlides - 1);
     dotsContainer.innerHTML = '';
 
     // 创建指示点
     slides.forEach((_, index) => {
         const dot = document.createElement('span');
-        dot.className = 'carousel-dot' + (index === 0 ? ' active' : '');
+        dot.className = 'carousel-dot' + (index === currentSlide ? ' active' : '');
         dot.addEventListener('click', () => goToSlide(index));
         dotsContainer.appendChild(dot);
+    });
+
+    slides.forEach((slide, index) => {
+        slide.classList.toggle('active', index === currentSlide);
     });
 
     // 左右按钮点击事件
@@ -343,11 +353,22 @@ function renderPortfolioSlides() {
     const slidesContainer = document.querySelector('.carousel-slides');
     if (!slidesContainer) return;
 
-    slidesContainer.innerHTML = config.portfolioImages.map((image, index) => `
-        <div class="carousel-slide${index === 0 ? ' active' : ''}">
-            <img src="${image}" alt="作品${index + 1}" />
-        </div>
-    `).join('');
+    const images = config.portfolioImages.filter(isSafeAssetPath);
+    if (images.length === 0) return;
+
+    slidesContainer.replaceChildren(
+        ...images.map((image, index) => {
+            const slide = document.createElement('div');
+            slide.className = `carousel-slide${index === 0 ? ' active' : ''}`;
+
+            const img = document.createElement('img');
+            img.src = image;
+            img.alt = `作品${index + 1}`;
+
+            slide.appendChild(img);
+            return slide;
+        })
+    );
 }
 
 function goToSlide(index) {
@@ -382,7 +403,7 @@ function startAutoPlay() {
 
     autoPlayInterval = setInterval(
         nextSlide,
-        Math.max(Number(config.portfolio.autoPlayInterval) || 4000, 1000)
+        Math.max(Number(config.portfolio.autoPlayInterval) || 4000, MIN_AUTOPLAY_INTERVAL)
     );
 }
 
