@@ -61,7 +61,7 @@
                         <span class="tag" data-i18n="pixiv-tag">发布打码作品</span>
                     </div>
                     
-                    <a href="https://www.pixiv.net/users/27233420" target="_blank" class="card-link" data-i18n="visit">访问主页</a>
+                    <a target="_blank" class="card-link" data-social-link="pixiv" data-i18n="visit">访问主页</a>
                 </div>
 
                 <!-- Bilibili -->
@@ -77,7 +77,7 @@
                         <span class="tag" data-i18n="bilibili-tag">一般晚上直播</span>
                     </div>
                     
-                    <a href="https://space.bilibili.com/3706955501669233?spm_id_from=333.1007.0.0" target="_blank" class="card-link" data-i18n="visit">访问频道</a>
+                    <a target="_blank" class="card-link" data-social-link="bilibili" data-i18n="visit">访问频道</a>
                 </div>
 
                 <!-- Twitter / X -->
@@ -93,7 +93,7 @@
                         <span class="tag" data-i18n="twitter-tag">只能发正常向作品</span>
                     </div>
                     
-                    <a href="https://x.com/xiaofeiyang678" target="_blank" class="card-link" data-i18n="visit">访问账号</a>
+                    <a target="_blank" class="card-link" data-social-link="twitter" data-i18n="visit">访问账号</a>
                 </div>
 
                 <!-- Fanbox -->
@@ -109,7 +109,7 @@
                         <span class="tag" data-i18n="fanbox-tag">发布无码作品</span>
                     </div>
                     
-                    <a href="https://xiaofeiyang.fanbox.cc/" target="_blank" class="card-link" data-i18n="visit">成为赞助者</a>
+                    <a target="_blank" class="card-link" data-social-link="fanbox" data-i18n="visit">成为赞助者</a>
                 </div>
             </div>
         </section>
@@ -120,23 +120,7 @@
             <div class="gallery-carousel">
                 <button class="carousel-btn prev" id="carouselPrev">‹</button>
                 <div class="carousel-track" id="carouselTrack">
-                    <div class="carousel-slides">
-                        <div class="carousel-slide active">
-                            <img src="assets/portfolio/work1.jpg" alt="作品1" />
-                        </div>
-                        <div class="carousel-slide">
-                            <img src="assets/portfolio/work2.jpg" alt="作品2" />
-                        </div>
-                        <div class="carousel-slide">
-                            <img src="assets/portfolio/work3.jpg" alt="作品3" />
-                        </div>
-                        <div class="carousel-slide">
-                            <img src="assets/portfolio/work4.jpg" alt="作品4" />
-                        </div>
-                        <div class="carousel-slide">
-                            <img src="assets/portfolio/work5.jpg" alt="作品5" />
-                        </div>
-                    </div>
+                    <div class="carousel-slides" id="carouselSlides"></div>
                 </div>
                 <button class="carousel-btn next" id="carouselNext">›</button>
             </div>
@@ -145,14 +129,14 @@
 
         <!-- 点赞区域 -->
         <section class="like-section">
-            <h2>喜欢我的作品就点个赞</h2>
+            <h2 data-i18n="like-title">喜欢我的作品就点个赞</h2>
             <div class="like-container">
                 <button class="like-btn" id="likeBtn">
                     <span class="like-icon">❤️</span>
                     <span class="like-count" id="likeCount">0</span>
                 </button>
                 <div class="like-emojis" id="likeEmojis">
-                    <span class="hint-text" id="hintText">点击按钮开始</span>
+                    <span class="hint-text" id="hintText" data-i18n="like-hint">点击按钮开始</span>
                 </div>
             </div>
         </section>
