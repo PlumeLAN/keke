@@ -136,7 +136,7 @@ function initPlatformLinks() {
 }
 
 function isSafeAssetPath(value) {
-    return typeof value === 'string' && /^assets\/[A-Za-z0-9/_\-.]+$/.test(value);
+    return typeof value === 'string' && /^assets\/[A-Za-z0-9/_.-]+$/.test(value);
 }
 
 // 主题切换
@@ -354,7 +354,12 @@ function renderPortfolioSlides() {
     if (!slidesContainer) return;
 
     const images = config.portfolioImages.filter(isSafeAssetPath);
-    if (images.length === 0) return;
+    if (images.length === 0) {
+        console.warn('No valid portfolio images found in config.json');
+        return;
+    }
+
+    const galleryItemAlt = translations['gallery-item-alt'] || 'Artwork';
 
     slidesContainer.replaceChildren(
         ...images.map((image, index) => {
@@ -363,7 +368,7 @@ function renderPortfolioSlides() {
 
             const img = document.createElement('img');
             img.src = image;
-            img.alt = `作品${index + 1}`;
+            img.alt = `${galleryItemAlt} ${index + 1}`;
 
             slide.appendChild(img);
             return slide;
