@@ -1,8 +1,15 @@
 // 配置对象
-const config = {
+const defaultConfig = {
     background: 'assets/backgrounds/default.jpg',
-    apiBaseUrl: 'http://localhost:5000/api'
+    apiBaseUrl: 'http://localhost:5000/api',
+    portfolioImages: [],
+    socialLinks: {},
+    portfolio: {
+        autoPlay: true,
+        autoPlayInterval: 4000
+    }
 };
+let config = {...defaultConfig};
 
 let translations = {};
 let currentLanguage = 'zh';
@@ -10,19 +17,44 @@ let currentLanguage = 'zh';
 // 点赞相关配置
 let likeCount = 0;
 let currentEmojiIndex = 0;
-const maxEmojis = 5;
+const LAST_EMOJI_INDEX = 5;
+const MIN_AUTOPLAY_INTERVAL = 1000;
 
 // 初始化函数
 document.addEventListener('DOMContentLoaded', async () => {
+    await initConfig();
     await initLanguage();
     initBackground();
+    initPlatformLinks();
     initLanguageSwitcher();
     initThemeToggle();
     initPlatformCards();
-    initStatObserver();
     await initLikeButton();
     initGalleryCarousel();
 });
+
+// 加载站点配置
+async function initConfig() {
+    try {
+        const response = await fetch('config.json');
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}`);
+        }
+
+        const siteConfig = await response.json();
+        config = {
+            ...defaultConfig,
+            ...siteConfig,
+            portfolio: {
+                ...defaultConfig.portfolio,
+                ...(siteConfig.portfolio || {})
+            }
+        };
+    } catch (error) {
+        console.error('Failed to load config file:', error);
+        config = {...defaultConfig};
+    }
+}
 
 // 加载语言文件
 async function initLanguage() {
@@ -83,7 +115,28 @@ function initLanguageSwitcher() {
 // 初始化背景
 function initBackground() {
     const bgContainer = document.getElementById('bgContainer');
-    bgContainer.style.backgroundImage = `url('${config.background}')`;
+    const background = isSafeAssetPath(config.background) ? config.background : defaultConfig.background;
+    bgContainer.style.backgroundImage = `url('${background}')`;
+}
+
+function initPlatformLinks() {
+    const socialLinks = {
+        ...config.socialLinks,
+        twitter: config.socialLinks?.twitter || config.socialLinks?.x
+    };
+
+    document.querySelectorAll('.platform-card').forEach(card => {
+        const platform = card.dataset.platform;
+        const link = card.querySelector('.card-link');
+
+        if (platform && link && socialLinks[platform]) {
+            link.href = socialLinks[platform];
+        }
+    });
+}
+
+function isSafeAssetPath(value) {
+    return typeof value === 'string' && /^assets\/[A-Za-z0-9/_.-]+$/.test(value);
 }
 
 // 主题切换
@@ -131,55 +184,6 @@ function initPlatformCards() {
     });
 }
 
-// 统计数据动画
-function animateCounter(element, finalValue, duration = 1000) {
-    const startValue = 0;
-    const startTime = Date.now();
-    
-    const updateCounter = () => {
-        const elapsed = Date.now() - startTime;
-        const progress = Math.min(elapsed / duration, 1);
-        
-        const match = finalValue.match(/(\d+\.?\d*)/);
-        if (match) {
-            const numericValue = parseFloat(match[0]);
-            const currentValue = startValue + (numericValue - startValue) * progress;
-            const unit = finalValue.replace(/[\d.]/g, '');
-            element.textContent = currentValue.toFixed(1) + unit;
-        }
-        
-        if (progress < 1) {
-            requestAnimationFrame(updateCounter);
-        }
-    };
-    
-    updateCounter();
-}
-
-// 观察统计卡片
-function initStatObserver() {
-    const observerOptions = {
-        threshold: 0.5,
-        rootMargin: '0px'
-    };
-    
-    const observer = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting && entry.target.classList.contains('stat-card')) {
-                const numberElement = entry.target.querySelector('.stat-number');
-                if (numberElement && !numberElement.animated) {
-                    animateCounter(numberElement, numberElement.textContent);
-                    numberElement.animated = true;
-                }
-            }
-        });
-    }, observerOptions);
-    
-    document.querySelectorAll('.stat-card').forEach(card => {
-        observer.observe(card);
-    });
-}
-
 // 点赞功能
 async function initLikeButton() {
     const likeBtn = document.getElementById('likeBtn');
@@ -200,70 +204,79 @@ async function initLikeButton() {
     }
     
     // 初始化显示
-    likeCountEl.textContent = likeCount;
-    
-    // 恢复之前显示的表情
-    if (currentEmojiIndex > 0) {
-        if (hintText) {
-            hintText.style.display = 'none';
-        }
-        addEmojiToDisplay(likeEmojisEl, currentEmojiIndex);
-    }
+    renderLikeState({
+        likeCountEl,
+        likeEmojisEl,
+        hintText
+    });
     
     // 点赞按钮点击事件
     likeBtn.addEventListener('click', async () => {
-        // 移除提示文字
-        if (hintText) {
-            hintText.style.display = 'none';
-        }
-        
-        if (currentEmojiIndex === 0) {
-            // 当前没有显示，显示第一张
-            currentEmojiIndex = 1;
-            likeCount++;
-            addEmojiToDisplay(likeEmojisEl, currentEmojiIndex);
-        } else if (currentEmojiIndex < maxEmojis) {
-            // 有显示，且不是最后一张，切换到下一张
-            likeEmojisEl.innerHTML = '';
-            currentEmojiIndex++;
-            likeCount++;
-            addEmojiToDisplay(likeEmojisEl, currentEmojiIndex);
-        } else {
-            // 当前显示第5张，刷新效果
-            likeCount++;
-            
-            // 淡出
-            const currentEmoji = likeEmojisEl.querySelector('.emoji-img');
-            if (currentEmoji) {
-                currentEmoji.style.animation = 'fadeOutLeft 0.3s ease forwards';
-                
-                // 淡出后淡入
-                setTimeout(() => {
-                    currentEmoji.style.animation = 'fadeInRight 0.3s ease';
-                }, 300);
-            }
-        }
-        
-        // 更新到 API
+        const previousEmojiIndex = currentEmojiIndex;
+        likeBtn.disabled = true;
+
         try {
-            await fetch(`${config.apiBaseUrl}/likes`, {
+            const response = await fetch(`${config.apiBaseUrl}/likes`, {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify({action: 'like'})
             });
+
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status}`);
+            }
+
+            const data = await response.json();
+            likeCount = data.likeCount;
+            currentEmojiIndex = Math.min(data.emojiIndex, LAST_EMOJI_INDEX);
+            renderLikeState({
+                likeCountEl,
+                likeEmojisEl,
+                hintText
+            });
+
+            if (previousEmojiIndex === LAST_EMOJI_INDEX && currentEmojiIndex === LAST_EMOJI_INDEX) {
+                animateCurrentEmoji(likeEmojisEl);
+            }
         } catch (error) {
             console.error('Failed to update likes:', error);
+        } finally {
+            likeBtn.disabled = false;
         }
-        
-        // 更新显示
-        likeCountEl.textContent = likeCount;
-        
-        // 添加动画效果
+
         likeBtn.style.transform = 'scale(1.2)';
         setTimeout(() => {
             likeBtn.style.transform = 'scale(1)';
         }, 200);
     });
+}
+
+function renderLikeState({likeCountEl, likeEmojisEl, hintText}) {
+    likeCountEl.textContent = likeCount;
+    likeEmojisEl.querySelectorAll('.emoji-img').forEach(emoji => emoji.remove());
+
+    if (currentEmojiIndex > 0) {
+        if (hintText) {
+            hintText.style.display = 'none';
+        }
+        addEmojiToDisplay(likeEmojisEl, currentEmojiIndex);
+        return;
+    }
+
+    if (hintText) {
+        hintText.style.display = '';
+        likeEmojisEl.appendChild(hintText);
+    }
+}
+
+function animateCurrentEmoji(container) {
+    const currentEmoji = container.querySelector('.emoji-img');
+    if (!currentEmoji) return;
+
+    currentEmoji.style.animation = 'fadeOutLeft 0.3s ease forwards';
+    setTimeout(() => {
+        currentEmoji.style.animation = 'fadeInRight 0.3s ease';
+    }, 300);
 }
 
 function addEmojiToDisplay(container, index) {
@@ -281,6 +294,8 @@ let totalSlides = 0;
 let autoPlayInterval;
 
 function initGalleryCarousel() {
+    renderPortfolioSlides();
+
     const slides = document.querySelectorAll('.carousel-slide');
     const dotsContainer = document.getElementById('carouselDots');
     const prevBtn = document.getElementById('carouselPrev');
@@ -289,13 +304,19 @@ function initGalleryCarousel() {
     if (slides.length === 0) return;
 
     totalSlides = slides.length;
+    currentSlide = Math.min(currentSlide, totalSlides - 1);
+    dotsContainer.innerHTML = '';
 
     // 创建指示点
     slides.forEach((_, index) => {
         const dot = document.createElement('span');
-        dot.className = 'carousel-dot' + (index === 0 ? ' active' : '');
+        dot.className = `carousel-dot${index === currentSlide ? ' active' : ''}`;
         dot.addEventListener('click', () => goToSlide(index));
         dotsContainer.appendChild(dot);
+    });
+
+    slides.forEach((slide, index) => {
+        slide.classList.toggle('active', index === currentSlide);
     });
 
     // 左右按钮点击事件
@@ -324,6 +345,37 @@ function initGalleryCarousel() {
     startAutoPlay();
 }
 
+function renderPortfolioSlides() {
+    if (!Array.isArray(config.portfolioImages) || config.portfolioImages.length === 0) {
+        return;
+    }
+
+    const slidesContainer = document.querySelector('.carousel-slides');
+    if (!slidesContainer) return;
+
+    const images = config.portfolioImages.filter(isSafeAssetPath);
+    if (images.length === 0) {
+        console.warn('No valid portfolio images found in config.json');
+        return;
+    }
+
+    const galleryItemAlt = translations['gallery-item-alt'] || 'Artwork';
+
+    slidesContainer.replaceChildren(
+        ...images.map((image, index) => {
+            const slide = document.createElement('div');
+            slide.className = 'carousel-slide';
+
+            const img = document.createElement('img');
+            img.src = image;
+            img.alt = `${galleryItemAlt} ${index + 1}`;
+
+            slide.appendChild(img);
+            return slide;
+        })
+    );
+}
+
 function goToSlide(index) {
     const slides = document.querySelectorAll('.carousel-slide');
     const dots = document.querySelectorAll('.carousel-dot');
@@ -349,7 +401,15 @@ function prevSlide() {
 
 function startAutoPlay() {
     clearInterval(autoPlayInterval);
-    autoPlayInterval = setInterval(nextSlide, 4000);
+
+    if (!config.portfolio?.autoPlay || totalSlides <= 1) {
+        return;
+    }
+
+    autoPlayInterval = setInterval(
+        nextSlide,
+        Math.max(Number(config.portfolio.autoPlayInterval) || 4000, MIN_AUTOPLAY_INTERVAL)
+    );
 }
 
 // 返回顶部功能
