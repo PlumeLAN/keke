@@ -17,7 +17,7 @@ let currentLanguage = 'zh';
 // 点赞相关配置
 let likeCount = 0;
 let currentEmojiIndex = 0;
-const MAX_EMOJI_INDEX = 5;
+const EMOJI_FRAME_COUNT = 5;
 const MIN_AUTOPLAY_INTERVAL = 1000;
 
 // 初始化函数
@@ -228,14 +228,14 @@ async function initLikeButton() {
 
             const data = await response.json();
             likeCount = data.likeCount;
-            currentEmojiIndex = Math.min(data.emojiIndex, MAX_EMOJI_INDEX);
+            currentEmojiIndex = Math.min(data.emojiIndex, EMOJI_FRAME_COUNT);
             renderLikeState({
                 likeCountEl,
                 likeEmojisEl,
                 hintText
             });
 
-            if (previousEmojiIndex === MAX_EMOJI_INDEX && currentEmojiIndex === MAX_EMOJI_INDEX) {
+            if (previousEmojiIndex === EMOJI_FRAME_COUNT && currentEmojiIndex === EMOJI_FRAME_COUNT) {
                 animateCurrentEmoji(likeEmojisEl);
             }
         } catch (error) {

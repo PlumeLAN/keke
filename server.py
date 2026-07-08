@@ -8,7 +8,7 @@ CORS(app)
 
 BASE_DIR = Path(__file__).resolve().parent
 DATA_FILE = BASE_DIR / 'likes.json'
-MAX_EMOJI_INDEX = 5
+EMOJI_FRAME_COUNT = 5
 DEFAULT_LIKES = {'likeCount': 0, 'emojiIndex': 0}
 
 def load_likes():
@@ -20,7 +20,7 @@ def load_likes():
             emoji_index = int(data.get('emojiIndex', 0))
             return {
                 'likeCount': max(like_count, 0),
-                'emojiIndex': min(max(emoji_index, 0), MAX_EMOJI_INDEX)
+                'emojiIndex': min(max(emoji_index, 0), EMOJI_FRAME_COUNT)
             }
     except (FileNotFoundError, json.JSONDecodeError, TypeError, ValueError):
         return DEFAULT_LIKES.copy()
@@ -44,7 +44,7 @@ def update_likes():
     action = payload.get('action')
     
     if action == 'like':
-        if data['emojiIndex'] < MAX_EMOJI_INDEX:
+        if data['emojiIndex'] < EMOJI_FRAME_COUNT:
             data['emojiIndex'] += 1
         data['likeCount'] += 1
     elif action == 'reset':
