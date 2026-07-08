@@ -1,30 +1,101 @@
-// 配置对象
-const config = {
+const defaultConfig = {
+    siteName: 'PlumeLAN',
     background: 'assets/backgrounds/default.jpg',
-    apiBaseUrl: 'http://localhost:5000/api'
+    portfolioImages: [
+        'assets/portfolio/work1.jpg',
+        'assets/portfolio/work2.jpg',
+        'assets/portfolio/work3.jpg',
+        'assets/portfolio/work4.jpg',
+        'assets/portfolio/work5.jpg'
+    ],
+    socialLinks: {
+        pixiv: '',
+        bilibili: '',
+        twitter: '',
+        fanbox: ''
+    },
+    portfolio: {
+        autoPlay: true,
+        autoPlayInterval: 5000
+    },
+    apiBaseUrl: 'auto'
 };
 
+let siteConfig = {
+    ...defaultConfig,
+    socialLinks: { ...defaultConfig.socialLinks },
+    portfolio: { ...defaultConfig.portfolio }
+};
 let translations = {};
 let currentLanguage = 'zh';
 
-// 点赞相关配置
 let likeCount = 0;
 let currentEmojiIndex = 0;
 const maxEmojis = 5;
+let currentSlide = 0;
+let totalSlides = 0;
+let autoPlayInterval;
 
-// 初始化函数
 document.addEventListener('DOMContentLoaded', async () => {
+    currentLanguage = localStorage.getItem('language') || currentLanguage;
+
+    await loadSiteConfig();
     await initLanguage();
-    initBackground();
     initLanguageSwitcher();
     initThemeToggle();
-    initPlatformCards();
-    initStatObserver();
+    initBackground();
+    applyConfiguredLinks();
     await initLikeButton();
     initGalleryCarousel();
 });
 
-// 加载语言文件
+async function loadSiteConfig() {
+    try {
+        const response = await fetch('config.json', { cache: 'no-store' });
+        if (!response.ok) {
+            throw new Error(`Failed to load config: ${response.status}`);
+        }
+
+        const loadedConfig = await response.json();
+        siteConfig = {
+            ...defaultConfig,
+            ...loadedConfig,
+            socialLinks: {
+                ...defaultConfig.socialLinks,
+                ...loadedConfig.socialLinks
+            },
+            portfolio: {
+                ...defaultConfig.portfolio,
+                ...loadedConfig.portfolio
+            }
+        };
+    } catch (error) {
+        console.error('Failed to load config.json:', error);
+    }
+
+    siteConfig.apiBaseUrl = resolveApiBaseUrl(siteConfig.apiBaseUrl);
+    document.title = `${siteConfig.siteName} - 个人网站`;
+}
+
+function resolveApiBaseUrl(value) {
+    if (value && value !== 'auto') {
+        return value.replace(/\/$/, '');
+    }
+
+    const { protocol, hostname, port, origin } = window.location;
+    const isLocalHost = hostname === 'localhost' || hostname === '127.0.0.1';
+
+    if ((protocol === 'http:' || protocol === 'https:') && isLocalHost && port && port !== '5000') {
+        return `${protocol}//${hostname}:5000/api`;
+    }
+
+    if (protocol === 'http:' || protocol === 'https:') {
+        return new URL('/api', origin).toString().replace(/\/$/, '');
+    }
+
+    return '/api';
+}
+
 async function initLanguage() {
     try {
         const response = await fetch(`i18n/${currentLanguage}.json`);
@@ -35,161 +106,94 @@ async function initLanguage() {
     }
 }
 
-// 更新语言
 function updateLanguage() {
-    document.querySelectorAll('[data-i18n]').forEach(el => {
+    document.documentElement.lang = currentLanguage;
+    document.querySelectorAll('[data-i18n]').forEach((el) => {
         const key = el.dataset.i18n;
         if (translations[key]) {
             el.textContent = translations[key];
         }
     });
-    
-    // 更新点赞区域的文本
-    const likeTitle = document.querySelector('.like-section h2');
-    const hintText = document.getElementById('hintText');
-    if (likeTitle && translations['like-title']) {
-        likeTitle.textContent = translations['like-title'];
-    }
-    if (hintText && translations['like-hint']) {
-        hintText.textContent = translations['like-hint'];
-    }
 }
 
-// 语言切换
 function initLanguageSwitcher() {
-    document.querySelectorAll('.lang-btn').forEach(btn => {
-        btn.addEventListener('click', async (e) => {
-            document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
-            e.target.classList.add('active');
-            currentLanguage = e.target.dataset.lang;
+    updateLanguageSwitcherState();
+
+    document.querySelectorAll('.lang-btn').forEach((btn) => {
+        btn.addEventListener('click', async (event) => {
+            currentLanguage = event.currentTarget.dataset.lang;
             localStorage.setItem('language', currentLanguage);
+            updateLanguageSwitcherState();
             await initLanguage();
         });
     });
-    
-    // 恢复语言设置
-    const savedLang = localStorage.getItem('language');
-    if (savedLang) {
-        currentLanguage = savedLang;
-        document.querySelectorAll('.lang-btn').forEach(btn => {
-            btn.classList.remove('active');
-            if (btn.dataset.lang === currentLanguage) {
-                btn.classList.add('active');
-            }
-        });
-    }
 }
 
-// 初始化背景
+function updateLanguageSwitcherState() {
+    document.querySelectorAll('.lang-btn').forEach((btn) => {
+        btn.classList.toggle('active', btn.dataset.lang === currentLanguage);
+    });
+}
+
 function initBackground() {
     const bgContainer = document.getElementById('bgContainer');
-    bgContainer.style.backgroundImage = `url('${config.background}')`;
+    if (bgContainer) {
+        bgContainer.style.backgroundImage = `url('${siteConfig.background}')`;
+    }
 }
 
-// 主题切换
 function initThemeToggle() {
     const themeToggle = document.getElementById('themeToggle');
+    if (!themeToggle) {
+        return;
+    }
+
     const savedTheme = localStorage.getItem('theme') || 'light';
-    
+    const themeIcon = themeToggle.querySelector('.theme-icon');
+
     if (savedTheme === 'dark') {
         document.documentElement.setAttribute('data-theme', 'dark');
-        themeToggle.querySelector('.theme-icon').textContent = '☀️';
     }
-    
+
+    if (themeIcon) {
+        themeIcon.textContent = savedTheme === 'dark' ? '☀️' : '🌙';
+    }
+
     themeToggle.addEventListener('click', () => {
         const currentTheme = document.documentElement.getAttribute('data-theme');
         const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-        
+
         document.documentElement.setAttribute('data-theme', newTheme);
         localStorage.setItem('theme', newTheme);
-        themeToggle.querySelector('.theme-icon').textContent = newTheme === 'dark' ? '☀️' : '🌙';
-    });
-}
 
-// 平滑滚动
-function scrollTo(selector) {
-    const element = document.querySelector(selector);
-    if (element) {
-        element.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }
-}
-
-window.scrollTo = scrollTo;
-
-// 平台卡片交互效果
-function initPlatformCards() {
-    const platformCards = document.querySelectorAll('.platform-card');
-    
-    platformCards.forEach(card => {
-        card.addEventListener('mouseenter', function() {
-            this.style.transform = 'translateY(-12px) scale(1.02)';
-        });
-        
-        card.addEventListener('mouseleave', function() {
-            this.style.transform = 'translateY(0) scale(1)';
-        });
-    });
-}
-
-// 统计数据动画
-function animateCounter(element, finalValue, duration = 1000) {
-    const startValue = 0;
-    const startTime = Date.now();
-    
-    const updateCounter = () => {
-        const elapsed = Date.now() - startTime;
-        const progress = Math.min(elapsed / duration, 1);
-        
-        const match = finalValue.match(/(\d+\.?\d*)/);
-        if (match) {
-            const numericValue = parseFloat(match[0]);
-            const currentValue = startValue + (numericValue - startValue) * progress;
-            const unit = finalValue.replace(/[\d.]/g, '');
-            element.textContent = currentValue.toFixed(1) + unit;
+        if (themeIcon) {
+            themeIcon.textContent = newTheme === 'dark' ? '☀️' : '🌙';
         }
-        
-        if (progress < 1) {
-            requestAnimationFrame(updateCounter);
-        }
-    };
-    
-    updateCounter();
-}
-
-// 观察统计卡片
-function initStatObserver() {
-    const observerOptions = {
-        threshold: 0.5,
-        rootMargin: '0px'
-    };
-    
-    const observer = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting && entry.target.classList.contains('stat-card')) {
-                const numberElement = entry.target.querySelector('.stat-number');
-                if (numberElement && !numberElement.animated) {
-                    animateCounter(numberElement, numberElement.textContent);
-                    numberElement.animated = true;
-                }
-            }
-        });
-    }, observerOptions);
-    
-    document.querySelectorAll('.stat-card').forEach(card => {
-        observer.observe(card);
     });
 }
 
-// 点赞功能
+function applyConfiguredLinks() {
+    document.querySelectorAll('[data-social-link]').forEach((link) => {
+        const href = siteConfig.socialLinks[link.dataset.socialLink];
+        if (href) {
+            link.href = href;
+            link.rel = 'noopener noreferrer';
+        }
+    });
+}
+
 async function initLikeButton() {
     const likeBtn = document.getElementById('likeBtn');
     const likeCountEl = document.getElementById('likeCount');
     const likeEmojisEl = document.getElementById('likeEmojis');
     const hintText = document.getElementById('hintText');
-    
-    // 从 API 获取点赞数据
+
+    if (!likeBtn || !likeCountEl || !likeEmojisEl) {
+        return;
+    }
+
     try {
-        const response = await fetch(`${config.apiBaseUrl}/likes`);
+        const response = await fetch(`${siteConfig.apiBaseUrl}/likes`);
         const data = await response.json();
         likeCount = data.likeCount;
         currentEmojiIndex = data.emojiIndex;
@@ -198,67 +202,53 @@ async function initLikeButton() {
         likeCount = 0;
         currentEmojiIndex = 0;
     }
-    
-    // 初始化显示
+
     likeCountEl.textContent = likeCount;
-    
-    // 恢复之前显示的表情
+
     if (currentEmojiIndex > 0) {
         if (hintText) {
             hintText.style.display = 'none';
         }
         addEmojiToDisplay(likeEmojisEl, currentEmojiIndex);
     }
-    
-    // 点赞按钮点击事件
+
     likeBtn.addEventListener('click', async () => {
-        // 移除提示文字
         if (hintText) {
             hintText.style.display = 'none';
         }
-        
+
         if (currentEmojiIndex === 0) {
-            // 当前没有显示，显示第一张
             currentEmojiIndex = 1;
-            likeCount++;
+            likeCount += 1;
             addEmojiToDisplay(likeEmojisEl, currentEmojiIndex);
         } else if (currentEmojiIndex < maxEmojis) {
-            // 有显示，且不是最后一张，切换到下一张
             likeEmojisEl.innerHTML = '';
-            currentEmojiIndex++;
-            likeCount++;
+            currentEmojiIndex += 1;
+            likeCount += 1;
             addEmojiToDisplay(likeEmojisEl, currentEmojiIndex);
         } else {
-            // 当前显示第5张，刷新效果
-            likeCount++;
-            
-            // 淡出
+            likeCount += 1;
+
             const currentEmoji = likeEmojisEl.querySelector('.emoji-img');
             if (currentEmoji) {
                 currentEmoji.style.animation = 'fadeOutLeft 0.3s ease forwards';
-                
-                // 淡出后淡入
                 setTimeout(() => {
                     currentEmoji.style.animation = 'fadeInRight 0.3s ease';
                 }, 300);
             }
         }
-        
-        // 更新到 API
+
         try {
-            await fetch(`${config.apiBaseUrl}/likes`, {
+            await fetch(`${siteConfig.apiBaseUrl}/likes`, {
                 method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({action: 'like'})
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ action: 'like' })
             });
         } catch (error) {
             console.error('Failed to update likes:', error);
         }
-        
-        // 更新显示
+
         likeCountEl.textContent = likeCount;
-        
-        // 添加动画效果
         likeBtn.style.transform = 'scale(1.2)';
         setTimeout(() => {
             likeBtn.style.transform = 'scale(1)';
@@ -275,44 +265,60 @@ function addEmojiToDisplay(container, index) {
     container.appendChild(emojiImg);
 }
 
-// 作品轮播功能
-let currentSlide = 0;
-let totalSlides = 0;
-let autoPlayInterval;
-
 function initGalleryCarousel() {
-    const slides = document.querySelectorAll('.carousel-slide');
+    const slidesContainer = document.getElementById('carouselSlides');
     const dotsContainer = document.getElementById('carouselDots');
     const prevBtn = document.getElementById('carouselPrev');
     const nextBtn = document.getElementById('carouselNext');
+    const carousel = document.querySelector('.gallery-carousel');
 
-    if (slides.length === 0) return;
+    if (!slidesContainer || !dotsContainer || !prevBtn || !nextBtn || !carousel) {
+        return;
+    }
 
-    totalSlides = slides.length;
+    const images = Array.isArray(siteConfig.portfolioImages) && siteConfig.portfolioImages.length > 0
+        ? siteConfig.portfolioImages
+        : defaultConfig.portfolioImages;
 
-    // 创建指示点
-    slides.forEach((_, index) => {
+    slidesContainer.innerHTML = '';
+    dotsContainer.innerHTML = '';
+    currentSlide = 0;
+
+    images.forEach((image, index) => {
+        const slide = document.createElement('div');
+        slide.className = `carousel-slide${index === 0 ? ' active' : ''}`;
+
+        const img = document.createElement('img');
+        img.src = image;
+        img.alt = `${siteConfig.siteName} artwork ${index + 1}`;
+
+        slide.appendChild(img);
+        slidesContainer.appendChild(slide);
+
         const dot = document.createElement('span');
-        dot.className = 'carousel-dot' + (index === 0 ? ' active' : '');
+        dot.className = `carousel-dot${index === 0 ? ' active' : ''}`;
         dot.addEventListener('click', () => goToSlide(index));
         dotsContainer.appendChild(dot);
     });
 
-    // 左右按钮点击事件
+    totalSlides = images.length;
+    const showControls = totalSlides > 1;
+    prevBtn.hidden = !showControls;
+    nextBtn.hidden = !showControls;
+    dotsContainer.hidden = !showControls;
+
     prevBtn.addEventListener('click', prevSlide);
     nextBtn.addEventListener('click', nextSlide);
 
-    // 触摸滑动支持
     let touchStartX = 0;
     let touchEndX = 0;
 
-    const carousel = document.querySelector('.gallery-carousel');
-    carousel.addEventListener('touchstart', (e) => {
-        touchStartX = e.changedTouches[0].screenX;
+    carousel.addEventListener('touchstart', (event) => {
+        touchStartX = event.changedTouches[0].screenX;
     });
 
-    carousel.addEventListener('touchend', (e) => {
-        touchEndX = e.changedTouches[0].screenX;
+    carousel.addEventListener('touchend', (event) => {
+        touchEndX = event.changedTouches[0].screenX;
         if (touchStartX - touchEndX > 50) {
             nextSlide();
         } else if (touchEndX - touchStartX > 50) {
@@ -320,41 +326,49 @@ function initGalleryCarousel() {
         }
     });
 
-    // 自动播放
-    startAutoPlay();
+    if (siteConfig.portfolio.autoPlay && totalSlides > 1) {
+        startAutoPlay();
+    } else {
+        clearInterval(autoPlayInterval);
+    }
 }
 
 function goToSlide(index) {
     const slides = document.querySelectorAll('.carousel-slide');
     const dots = document.querySelectorAll('.carousel-dot');
 
+    if (!slides.length || !dots.length) {
+        return;
+    }
+
     slides[currentSlide].classList.remove('active');
     dots[currentSlide].classList.remove('active');
 
     currentSlide = index;
-    if (currentSlide >= totalSlides) currentSlide = 0;
-    if (currentSlide < 0) currentSlide = totalSlides - 1;
+    if (currentSlide >= totalSlides) {
+        currentSlide = 0;
+    }
+    if (currentSlide < 0) {
+        currentSlide = totalSlides - 1;
+    }
 
     slides[currentSlide].classList.add('active');
     dots[currentSlide].classList.add('active');
 }
 
 function nextSlide() {
-    goToSlide((currentSlide + 1) % totalSlides);
+    if (totalSlides > 1) {
+        goToSlide((currentSlide + 1) % totalSlides);
+    }
 }
 
 function prevSlide() {
-    goToSlide((currentSlide - 1 + totalSlides) % totalSlides);
+    if (totalSlides > 1) {
+        goToSlide((currentSlide - 1 + totalSlides) % totalSlides);
+    }
 }
 
 function startAutoPlay() {
     clearInterval(autoPlayInterval);
-    autoPlayInterval = setInterval(nextSlide, 4000);
+    autoPlayInterval = setInterval(nextSlide, Number(siteConfig.portfolio.autoPlayInterval) || 5000);
 }
-
-// 返回顶部功能
-window.addEventListener('scroll', () => {
-    if (window.scrollY > 300) {
-        // 可以在这里添加返回顶部按钮的显示逻辑
-    }
-});

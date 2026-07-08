@@ -10,12 +10,13 @@
     ],
     "socialLinks": {
         "pixiv": "https://www.pixiv.net/users/27233420",
-        "x": "https://x.com/xiaofeiyang678",
         "bilibili": "https://space.bilibili.com/3706955501669233?spm_id_from=333.1007.0.0",
+        "twitter": "https://x.com/xiaofeiyang678",
         "fanbox": "https://xiaofeiyang.fanbox.cc/"
     },
     "portfolio": {
         "autoPlay": true,
         "autoPlayInterval": 5000
-    }
+    },
+    "apiBaseUrl": "auto"
 }
