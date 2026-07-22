@@ -9,7 +9,8 @@
     --secondary-color: #764ba2;
     --text-color: #333;
     --light-text: #666;
-    --bg-overlay: rgba(255, 255, 255, 0.95);
+    --panel-opacity: 0.72;
+    --bg-overlay: rgba(255, 255, 255, var(--panel-opacity));
     --transition: all 0.3s ease;
     
     /* 平台颜色 */
@@ -25,7 +26,7 @@ html[data-theme="dark"] {
     --primary-color: #a78bfa;
     --text-color: #f3f4f6;
     --light-text: #d1d5db;
-    --bg-overlay: rgba(20, 20, 30, 0.95);
+    --bg-overlay: rgba(20, 20, 30, var(--panel-opacity));
 }
 
 /* 背景 */
@@ -81,6 +82,28 @@ html[data-theme="dark"] body {
     display: flex;
     gap: 10px;
     z-index: 100;
+}
+
+.panel-opacity-control {
+    display: grid;
+    grid-template-columns: auto minmax(88px, 120px) 3ch;
+    align-items: center;
+    gap: 8px;
+    color: var(--light-text);
+    font-size: 14px;
+    white-space: nowrap;
+}
+
+.panel-opacity-slider {
+    accent-color: var(--primary-color);
+    cursor: pointer;
+    width: 100%;
+}
+
+.panel-opacity-control output {
+    color: var(--primary-color);
+    font-variant-numeric: tabular-nums;
+    text-align: right;
 }
 
 .lang-btn {
@@ -626,6 +649,10 @@ html[data-theme="dark"] .carousel-track {
     }
 
     .lang-switcher {
+        justify-content: center;
+    }
+
+    .panel-opacity-control {
         justify-content: center;
     }
 

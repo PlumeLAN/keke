@@ -18,7 +18,13 @@
                 <button class="lang-btn active" data-lang="zh">中文</button>
                 <button class="lang-btn" data-lang="en">English</button>
             </div>
-            
+
+            <div class="panel-opacity-control">
+                <label for="panelOpacity" data-i18n="panel-opacity-label">背景透明度</label>
+                <input class="panel-opacity-slider" id="panelOpacity" type="range" min="0.35" max="0.95" step="0.01" value="0.72" />
+                <output id="panelOpacityValue" for="panelOpacity">72%</output>
+            </div>
+
             <button class="theme-toggle" id="themeToggle" title="切换主题">
                 <span class="theme-icon">🌙</span>
             </button>

@@ -33,6 +33,9 @@ let currentLanguage = 'zh';
 let likeCount = 0;
 let currentEmojiIndex = 0;
 const maxEmojis = 5;
+const defaultPanelOpacity = 0.72;
+const minPanelOpacity = 0.35;
+const maxPanelOpacity = 0.95;
 let likeRequestPending = false;
 let currentSlide = 0;
 let totalSlides = 0;
@@ -45,6 +48,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     await initLanguage();
     initLanguageSwitcher();
     initThemeToggle();
+    initPanelOpacityControl();
     initBackground();
     applyConfiguredLinks();
     await initLikeButton();
@@ -175,6 +179,37 @@ function initThemeToggle() {
             themeIcon.textContent = newTheme === 'dark' ? '☀️' : '🌙';
         }
     });
+}
+
+function initPanelOpacityControl() {
+    const opacityInput = document.getElementById('panelOpacity');
+    const opacityOutput = document.getElementById('panelOpacityValue');
+
+    if (!opacityInput || !opacityOutput) {
+        return;
+    }
+
+    const savedOpacity = Number.parseFloat(localStorage.getItem('panelOpacity'));
+    const initialOpacity = Number.isFinite(savedOpacity)
+        && savedOpacity >= minPanelOpacity
+        && savedOpacity <= maxPanelOpacity
+        ? savedOpacity
+        : defaultPanelOpacity;
+
+    applyPanelOpacity(initialOpacity, opacityInput, opacityOutput);
+
+    opacityInput.addEventListener('input', (event) => {
+        const opacity = Number.parseFloat(event.currentTarget.value);
+        applyPanelOpacity(opacity, opacityInput, opacityOutput);
+        localStorage.setItem('panelOpacity', String(opacity));
+    });
+}
+
+function applyPanelOpacity(opacity, opacityInput, opacityOutput) {
+    const clampedOpacity = Math.min(Math.max(opacity, minPanelOpacity), maxPanelOpacity);
+    document.documentElement.style.setProperty('--panel-opacity', String(clampedOpacity));
+    opacityInput.value = String(clampedOpacity);
+    opacityOutput.textContent = `${Math.round(clampedOpacity * 100)}%`;
 }
 
 function applyConfiguredLinks() {
