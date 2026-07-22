@@ -55,6 +55,7 @@ python server.py
 - `FLASK_HOST`：监听地址，默认 `0.0.0.0`
 - `FLASK_DEBUG`：设为 `1` 时开启调试模式，默认关闭
 - `LIKES_DATA_FILE`：自定义点赞数据文件路径
+- `CORS_ALLOWED_ORIGINS`：逗号分隔的允许跨域来源；默认只允许 `localhost` 和 `127.0.0.1` 的本机开发端口。前后端分离部署时必须显式设置，例如 `https://example.com`
 
 ### 2. 启动前端静态服务
 
@@ -109,6 +110,7 @@ python -m http.server 8000
 
 - 保持与现有 Flask `/api/likes` 接口兼容。
 - 如果 `likes.json` 缺失、为空或内容损坏，后端会自动回退到默认值并重新写入文件。
+- 点赞数据使用进程内锁和原子替换文件写入，适合单进程部署；多进程或多实例部署应改用数据库或托管存储。
 - 该项目适合轻量展示或演示部署；若需要长期线上持久化，建议将点赞数据迁移到数据库或托管存储。
 
 ## 基础校验
@@ -118,4 +120,5 @@ python -m http.server 8000
 ```bash
 node --check script.js
 python -m py_compile server.py
+python -m unittest discover -s tests
 ```

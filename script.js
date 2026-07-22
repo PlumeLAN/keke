@@ -12,7 +12,8 @@ const defaultConfig = {
         pixiv: '',
         bilibili: '',
         twitter: '',
-        fanbox: ''
+        fanbox: '',
+        discord: ''
     },
     portfolio: {
         autoPlay: true,
@@ -32,6 +33,7 @@ let currentLanguage = 'zh';
 let likeCount = 0;
 let currentEmojiIndex = 0;
 const maxEmojis = 5;
+let likeRequestPending = false;
 let currentSlide = 0;
 let totalSlides = 0;
 let autoPlayInterval;
@@ -99,6 +101,9 @@ function resolveApiBaseUrl(value) {
 async function initLanguage() {
     try {
         const response = await fetch(`i18n/${currentLanguage}.json`);
+        if (!response.ok) {
+            throw new Error(`Failed to load language file: ${response.status}`);
+        }
         translations = await response.json();
         updateLanguage();
     } catch (error) {
@@ -175,11 +180,23 @@ function initThemeToggle() {
 function applyConfiguredLinks() {
     document.querySelectorAll('[data-social-link]').forEach((link) => {
         const href = siteConfig.socialLinks[link.dataset.socialLink];
-        if (href) {
+        if (isSafeExternalUrl(href)) {
             link.href = href;
             link.rel = 'noopener noreferrer';
+        } else {
+            link.removeAttribute('href');
+            link.setAttribute('aria-disabled', 'true');
         }
     });
+}
+
+function isSafeExternalUrl(value) {
+    try {
+        const url = new URL(value);
+        return url.protocol === 'https:' || url.protocol === 'http:';
+    } catch {
+        return false;
+    }
 }
 
 async function initLikeButton() {
@@ -193,67 +210,76 @@ async function initLikeButton() {
     }
 
     try {
-        const response = await fetch(`${siteConfig.apiBaseUrl}/likes`);
-        const data = await response.json();
-        likeCount = data.likeCount;
-        currentEmojiIndex = data.emojiIndex;
+        applyLikeState(await requestLikes());
     } catch (error) {
         console.error('Failed to fetch likes:', error);
-        likeCount = 0;
-        currentEmojiIndex = 0;
+        likeBtn.disabled = true;
+        likeBtn.title = '点赞服务不可用';
     }
 
-    likeCountEl.textContent = likeCount;
+    renderLikeState(likeCountEl, likeEmojisEl, hintText);
+
+    likeBtn.addEventListener('click', async () => {
+        if (likeRequestPending) {
+            return;
+        }
+
+        likeRequestPending = true;
+        likeBtn.disabled = true;
+        try {
+            const response = await fetch(`${siteConfig.apiBaseUrl}/likes`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ action: 'like' })
+            });
+            if (!response.ok) {
+                throw new Error(`Failed to update likes: ${response.status}`);
+            }
+
+            applyLikeState(await response.json());
+            renderLikeState(likeCountEl, likeEmojisEl, hintText);
+            likeBtn.style.transform = 'scale(1.2)';
+            setTimeout(() => {
+                likeBtn.style.transform = 'scale(1)';
+            }, 200);
+        } catch (error) {
+            console.error('Failed to update likes:', error);
+        } finally {
+            likeRequestPending = false;
+            likeBtn.disabled = false;
+        }
+    });
+}
+
+async function requestLikes() {
+    const response = await fetch(`${siteConfig.apiBaseUrl}/likes`);
+    if (!response.ok) {
+        throw new Error(`Failed to fetch likes: ${response.status}`);
+    }
+    return response.json();
+}
+
+function applyLikeState(data) {
+    if (!data || !Number.isSafeInteger(data.likeCount) || !Number.isSafeInteger(data.emojiIndex)) {
+        throw new Error('Invalid likes response');
+    }
+
+    likeCount = Math.max(data.likeCount, 0);
+    currentEmojiIndex = Math.min(Math.max(data.emojiIndex, 0), maxEmojis);
+}
+
+function renderLikeState(likeCountEl, likeEmojisEl, hintText) {
+    likeCountEl.textContent = String(likeCount);
+    likeEmojisEl.querySelector('.emoji-img')?.remove();
 
     if (currentEmojiIndex > 0) {
         if (hintText) {
             hintText.style.display = 'none';
         }
         addEmojiToDisplay(likeEmojisEl, currentEmojiIndex);
+    } else if (hintText) {
+        hintText.style.display = '';
     }
-
-    likeBtn.addEventListener('click', async () => {
-        if (hintText) {
-            hintText.style.display = 'none';
-        }
-
-        if (currentEmojiIndex === 0) {
-            currentEmojiIndex = 1;
-            likeCount += 1;
-            addEmojiToDisplay(likeEmojisEl, currentEmojiIndex);
-        } else if (currentEmojiIndex < maxEmojis) {
-            likeEmojisEl.innerHTML = '';
-            currentEmojiIndex += 1;
-            likeCount += 1;
-            addEmojiToDisplay(likeEmojisEl, currentEmojiIndex);
-        } else {
-            likeCount += 1;
-
-            const currentEmoji = likeEmojisEl.querySelector('.emoji-img');
-            if (currentEmoji) {
-                currentEmoji.style.animation = 'fadeOutLeft 0.3s ease forwards';
-                setTimeout(() => {
-                    currentEmoji.style.animation = 'fadeInRight 0.3s ease';
-                }, 300);
-            }
-        }
-
-        try {
-            await fetch(`${siteConfig.apiBaseUrl}/likes`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ action: 'like' })
-            });
-        } catch (error) {
-            console.error('Failed to update likes:', error);
-        }
-
-        likeCountEl.textContent = likeCount;
-        likeBtn.style.transform = 'scale(1.2)';
-        setTimeout(() => {
-            likeBtn.style.transform = 'scale(1)';
-        }, 200);
-    });
 }
 
 function addEmojiToDisplay(container, index) {
